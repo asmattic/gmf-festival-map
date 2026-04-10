@@ -12,6 +12,7 @@ Shared festival map platform for Gasparilla Music Festival—**independent** of 
 - `packages/map-sw` — service worker helpers for offline/static asset caching
 - `standalone/` — static HTML + sample JSON (no bundler)
 - `docs/` — **indexed** architecture and implementation docs ([start here](docs/INDEX.md))
+- `.github/workflows/` — CI on PRs/pushes to `main` (`pnpm typecheck`, WP block build)
 
 ## Core architectural idea
 
