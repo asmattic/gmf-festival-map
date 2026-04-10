@@ -170,7 +170,7 @@ npx --yes serve standalone
 
 ## 10. Verification checklist
 
-- [ ] `pnpm install && pnpm typecheck` passes
+- [ ] `pnpm install && pnpm typecheck` passes (GitHub Actions runs this on PRs to `main`)
 - [ ] Next: `pnpm --filter @gmf/web-next dev` → `/map` shows OSM, overlay (if PNG exists), POIs
 - [ ] WP: block build, install plugin, set API base if needed, confirm front-end markers
 - [ ] Standalone: add `venue-overlay.png`, serve folder over HTTP, confirm overlay alignment with bounds

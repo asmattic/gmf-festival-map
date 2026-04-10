@@ -9,6 +9,7 @@ Start here for navigation across all repo documentation.
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Repo layout, caching boundaries, delivery targets |
 | [DECISIONS.md](./DECISIONS.md) | Product and technical decision log |
 | [CODEX-HANDOFF.md](./CODEX-HANDOFF.md) | Quick onboarding checklist for agents and new contributors |
+| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | PR/push CI: `pnpm typecheck`, WordPress block build |
 
 ## Topic → where to read
 
@@ -23,6 +24,7 @@ Start here for navigation across all repo documentation.
 | Shared React map components | [MAP-IMPLEMENTATION §3](./MAP-IMPLEMENTATION.md#3-shared-ui-map-ui) | `packages/map-ui/src/components/` |
 | Package responsibilities | [ARCHITECTURE.md](./ARCHITECTURE.md) | — |
 | What not to do | [CODEX-HANDOFF.md](./CODEX-HANDOFF.md#what-not-to-do) | — |
+| CI on GitHub | [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | — |
 
 ## Source tree (high level)
 
