@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import '../tokens/gmf-design-tokens.css';
@@ -48,10 +47,11 @@ export function FestivalMap({
 }: Props) {
   const [lng0, lat0] = center;
   const mapNodeRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const stagesGroupRef = useRef<L.LayerGroup | null>(null);
-  const markersGroupRef = useRef<L.LayerGroup | null>(null);
-  const overlayLayerRef = useRef<L.ImageOverlay | null>(null);
+  const leafletRef = useRef<typeof import('leaflet') | null>(null);
+  const mapRef = useRef<any>(null);
+  const stagesGroupRef = useRef<any>(null);
+  const markersGroupRef = useRef<any>(null);
+  const overlayLayerRef = useRef<any>(null);
   const [mapReady, setMapReady] = useState(false);
   const [selected, setSelected] = useState<PoiCategory[]>([]);
 
@@ -63,29 +63,39 @@ export function FestivalMap({
   useEffect(() => {
     if (!mapNodeRef.current || mapRef.current) return;
 
-    const map = L.map(mapNodeRef.current, {
-      scrollWheelZoom: true,
-      zoomControl: true
-    });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+    let cancelled = false;
+    let mapInstance: any = null;
 
-    map.setView([lat0, lng0], zoom);
-    const stagesGroup = L.layerGroup().addTo(map);
-    const markersGroup = L.layerGroup().addTo(map);
-    stagesGroupRef.current = stagesGroup;
-    markersGroupRef.current = markersGroup;
-    mapRef.current = map;
-    setMapReady(true);
+    void import('leaflet').then((L) => {
+      if (cancelled || !mapNodeRef.current) return;
+      leafletRef.current = L;
+
+      const map = L.map(mapNodeRef.current, {
+        scrollWheelZoom: true,
+        zoomControl: true
+      });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      map.setView([lat0, lng0], zoom);
+      const stagesGroup = L.layerGroup().addTo(map);
+      const markersGroup = L.layerGroup().addTo(map);
+      stagesGroupRef.current = stagesGroup;
+      markersGroupRef.current = markersGroup;
+      mapRef.current = map;
+      mapInstance = map;
+      setMapReady(true);
+    });
 
     return () => {
+      cancelled = true;
       setMapReady(false);
-      overlayLayerRef.current?.remove();
+      overlayLayerRef.current?.remove?.();
       overlayLayerRef.current = null;
-      map.remove();
+      mapInstance?.remove?.();
       mapRef.current = null;
       stagesGroupRef.current = null;
       markersGroupRef.current = null;
@@ -107,6 +117,8 @@ export function FestivalMap({
   useEffect(() => {
     if (!mapReady) return;
     const map = mapRef.current;
+    const L = leafletRef.current;
+    if (!L) return;
     if (!map) return;
 
     if (overlayLayerRef.current) {
@@ -127,6 +139,8 @@ export function FestivalMap({
 
   useEffect(() => {
     if (!mapReady) return;
+    const L = leafletRef.current;
+    if (!L) return;
     const group = stagesGroupRef.current;
     if (!group) return;
 
@@ -151,6 +165,8 @@ export function FestivalMap({
 
   useEffect(() => {
     if (!mapReady) return;
+    const L = leafletRef.current;
+    if (!L) return;
     const group = markersGroupRef.current;
     if (!group) return;
 
