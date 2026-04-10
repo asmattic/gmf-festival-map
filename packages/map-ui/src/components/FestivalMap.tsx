@@ -49,6 +49,7 @@ export function FestivalMap({
   const [lng0, lat0] = center;
   const mapNodeRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const stagesGroupRef = useRef<L.LayerGroup | null>(null);
   const markersGroupRef = useRef<L.LayerGroup | null>(null);
   const overlayLayerRef = useRef<L.ImageOverlay | null>(null);
   const [mapReady, setMapReady] = useState(false);
@@ -73,7 +74,9 @@ export function FestivalMap({
     }).addTo(map);
 
     map.setView([lat0, lng0], zoom);
+    const stagesGroup = L.layerGroup().addTo(map);
     const markersGroup = L.layerGroup().addTo(map);
+    stagesGroupRef.current = stagesGroup;
     markersGroupRef.current = markersGroup;
     mapRef.current = map;
     setMapReady(true);
@@ -84,6 +87,7 @@ export function FestivalMap({
       overlayLayerRef.current = null;
       map.remove();
       mapRef.current = null;
+      stagesGroupRef.current = null;
       markersGroupRef.current = null;
     };
     // Initial view only; updates use the effect below.
@@ -123,6 +127,30 @@ export function FestivalMap({
 
   useEffect(() => {
     if (!mapReady) return;
+    const group = stagesGroupRef.current;
+    if (!group) return;
+
+    group.clearLayers();
+    for (const stage of stages) {
+      const [slng, slat] = stage.coordinates;
+      const marker = L.circleMarker([slat, slng], {
+        radius: 9,
+        fillColor: '#c9a227',
+        color: '#ffffff',
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 0.95
+      });
+      const desc = stage.description
+        ? `<br><span style="opacity:.85">${escapeHtml(stage.description)}</span>`
+        : '';
+      marker.bindPopup(`<strong>${escapeHtml(stage.name)}</strong> (stage)${desc}`);
+      marker.addTo(group);
+    }
+  }, [stages, mapReady]);
+
+  useEffect(() => {
+    if (!mapReady) return;
     const group = markersGroupRef.current;
     if (!group) return;
 
@@ -146,9 +174,7 @@ export function FestivalMap({
       );
       marker.addTo(group);
     }
-
-    void stages;
-  }, [visiblePois, stages, mapReady]);
+  }, [visiblePois, mapReady]);
 
   function toggleCategory(category: PoiCategory) {
     setSelected((prev: PoiCategory[]) =>
@@ -159,7 +185,7 @@ export function FestivalMap({
   return (
     <div className="gmf-map-shell">
       <MapFilters selected={selected} onToggle={toggleCategory} />
-      {showLegend ? <MapLegend /> : null}
+      {showLegend ? <MapLegend showStages={stages.length > 0} /> : null}
       <div ref={mapNodeRef} className="gmf-map-canvas" style={{ width: '100%', height }} />
     </div>
   );
