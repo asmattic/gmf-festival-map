@@ -1,6 +1,6 @@
-import MapClient from './MapClient';
+'use client';
 
-export const revalidate = 300;
+import MapClient from './MapClient';
 
 export default function MapPage() {
   return <MapClient />;
