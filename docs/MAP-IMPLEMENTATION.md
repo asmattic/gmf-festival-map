@@ -132,9 +132,9 @@ Location: **`standalone/`**
 
 | File | Role |
 | ---- | ---- |
-| `index.html` | Leaflet + OSM + filters + legend; loads POI and overlay JSON via `fetch` |
+| `index.html` | Leaflet + OSM + filters + legend; loads POI, overlay, and **stages** JSON via `fetch` |
 | `data/pois.json` | POI array (same shape as API) |
-| `data/stages.json` | Same schema as API (sample file for copy/paste); **`index.html` does not fetch it yet** — add a fetch if you need stage markers in the static build |
+| `data/stages.json` | `Stage[]` (same schema as API); rendered as **gold square-ish** circle markers (distinct from POI dots) |
 | `data/overlay.json` | `VenueOverlay` JSON; `url` points to `venue-overlay.png` by default |
 
 Place **`venue-overlay.png`** next to `index.html` (or update `overlay.json`). Serve the folder over HTTP, e.g.:

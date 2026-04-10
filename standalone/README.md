@@ -8,7 +8,7 @@ This folder is a **zero-build** copy of the map: Leaflet, OpenStreetMap, the sam
 | ---- | ------- |
 | `index.html` | Map page (loads Leaflet from CDN) |
 | `data/pois.json` | POI list |
-| `data/stages.json` | Sample stages (same schema as API; extend `index.html` if you need stage markers) |
+| `data/stages.json` | Stages (same schema as API); shown as gold stage markers on the map |
 | `data/overlay.json` | Venue overlay metadata (`url` + `bounds`) |
 | `venue-overlay.png` | **You add this** — final venue map raster; path must match `overlay.json` |
 

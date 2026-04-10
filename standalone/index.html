@@ -125,6 +125,20 @@
         border-radius: 50%;
         border: 2px solid rgba(255, 255, 255, 0.45);
       }
+      .gmf-map-legend .swatch-stage {
+        width: 11px;
+        height: 11px;
+        border-radius: 3px;
+        border: 2px solid rgba(255, 255, 255, 0.85);
+        background: linear-gradient(145deg, #c9a227, #7a5c12);
+      }
+      .gmf-map-legend .legend-stages-title {
+        margin: 10px 0 6px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--gmf-text-muted);
+      }
     </style>
   </head>
   <body>
@@ -198,21 +212,26 @@
                 '</li>'
               );
             }).join('') +
-            '</ul>';
+            '</ul>' +
+            '<p class="legend-stages-title">Stages</p>' +
+            '<ul><li><span class="swatch-stage" aria-hidden="true"></span>Performance stages</li></ul>';
         }
 
         function main() {
           renderLegend(document.getElementById('gmf-legend'));
 
-          loadJson('data/pois.json')
-            .then(function (pois) {
-              return loadJson('data/overlay.json').then(function (overlay) {
-                return { pois: pois, overlay: overlay };
-              });
+          Promise.all([
+            loadJson('data/pois.json'),
+            loadJson('data/overlay.json'),
+            loadJson('data/stages.json')
+          ])
+            .then(function (results) {
+              return { pois: results[0], overlay: results[1], stages: results[2] };
             })
             .then(function (_ref) {
               var pois = _ref.pois;
               var overlay = _ref.overlay;
+              var stages = _ref.stages;
 
               var map = L.map('gmf-map', { scrollWheelZoom: true }).setView(CENTER, ZOOM);
               L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -231,8 +250,32 @@
               }
 
               var markersLayer = L.layerGroup().addTo(map);
+              var stagesLayer = L.layerGroup().addTo(map);
               var filtersEl = document.getElementById('gmf-filters');
               var selected = [];
+
+              function drawStageMarkers() {
+                stagesLayer.clearLayers();
+                if (!Array.isArray(stages)) return;
+                stages.forEach(function (stage) {
+                  var lng = stage.coordinates[0];
+                  var lat = stage.coordinates[1];
+                  var m = L.circleMarker([lat, lng], {
+                    radius: 9,
+                    fillColor: '#c9a227',
+                    color: '#ffffff',
+                    weight: 3,
+                    opacity: 1,
+                    fillOpacity: 0.95
+                  });
+                  var desc = stage.description
+                    ? '<br><span style="opacity:.85">' + escapeHtml(stage.description) + '</span>'
+                    : '';
+                  m.bindPopup('<strong>' + escapeHtml(stage.name) + '</strong> (stage)' + desc);
+                  m.addTo(stagesLayer);
+                });
+              }
+              drawStageMarkers();
 
               function visible() {
                 if (selected.length === 0) return pois;
