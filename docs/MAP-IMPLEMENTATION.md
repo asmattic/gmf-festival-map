@@ -91,6 +91,10 @@ Clients request three resources relative to an **API base URL** (scheme + host, 
 
 **Caching:** route handlers set `Cache-Control`; TanStack Query policies are in `map-core` `cachePolicies.ts`.
 
+**Overlay image URLs:** When the overlay JSON returns a **root-relative** `url` (e.g. `/maps/gmf/venue-overlay.png`) and the client uses a non-empty **API base URL** (typical WordPress → Next), [`fetchOverlay`](packages/map-data/src/fetchOverlay.ts) prefixes that path with the base so Leaflet requests the image from the API host, not the WordPress origin. Absolute `http(s)://` URLs are left unchanged.
+
+**Demo venue raster:** The Next app ships `apps/web-next/public/maps/gmf/venue-overlay.png` for local demos. Swap in your final map artwork and keep the handler’s `url` + `bounds` aligned. For production you may prefer a full `https://…` URL from the API or a CDN to avoid committing large binaries.
+
 ---
 
 ## 6. WordPress block
@@ -106,7 +110,7 @@ Clients request three resources relative to an **API base URL** (scheme + host, 
 | --------- | ---- | ------- | ------- |
 | `height` | number | `640` | Map container height (px) |
 | `showLegend` | boolean | `true` | Toggle legend panel |
-| `apiBaseUrl` | string | `""` | Origin for `/api/map/*`; empty = same origin as WP |
+| `apiBaseUrl` | string | `""` | Origin for `/api/map/*`; empty = same origin as WP. Also used to absolutize root-relative overlay image paths from the API. |
 | `centerLat` | number | `27.9514` | Initial map center latitude |
 | `centerLng` | number | `-82.4605` | Initial map center longitude |
 | `mapZoom` | number | `15` | Initial zoom (12–19 in editor range control) |
