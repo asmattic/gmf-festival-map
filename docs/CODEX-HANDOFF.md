@@ -11,9 +11,12 @@ A working scaffold designed to be moved into Codex with minimal manual setup: **
 
 ### Step 1
 
-Run install and typecheck.
+Use Node **24.x** via **nvm** (see root `.nvmrc` and `package.json` `engines`). Then enable **Corepack** (preferred) to activate the pinned pnpm from `packageManager`.
 
 ```bash
+nvm use
+corepack enable
+corepack prepare pnpm@10.6.0 --activate
 pnpm install
 pnpm typecheck
 ```

@@ -24,9 +24,29 @@ Treat the festival map as a shared product surface, not a one-off page widget.
 - Service Worker can own immutable assets (e.g. venue overlay); OSM tiles load from the network by default.
 - Shared packages own types, query keys, fetchers, and reusable UI.
 
+## Toolchain (Node + pnpm)
+
+Use **[nvm](https://github.com/nvm-sh/nvm)** for Node. This repo supports **Corepack-first pnpm** via root [`package.json`](package.json) `packageManager`, with npm-global pnpm as fallback.
+
+- **Node.js 24.x** — Active LTS line.
+- **pnpm 10.x** — pinned by `packageManager` (`pnpm@10.6.0`) for Corepack users.
+
+```bash
+nvm install
+nvm use
+# Preferred: Corepack-managed pnpm from packageManager
+corepack enable
+corepack prepare pnpm@10.6.0 --activate
+
+# Fallback (if you intentionally avoid Corepack):
+npm install -g pnpm@10
+pnpm install
+```
+
 ## Install
 
 ```bash
+nvm use
 pnpm install
 ```
 
