@@ -1,0 +1,26 @@
+{
+  "name": "@gmf/web-next",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gmf/map-core": "workspace:*",
+    "@gmf/map-data": "workspace:*",
+    "@gmf/map-ui": "workspace:*",
+    "@tanstack/react-query": "^5.90.2",
+    "next": "^16.0.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.8.2"
+  }
+}

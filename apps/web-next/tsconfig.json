@@ -1,0 +1,12 @@
+{
+  "extends": "../../tooling/tsconfig/next-app.json",
+  "compilerOptions": {
+    "paths": {
+      "@gmf/map-core": ["../../packages/map-core/src/index.ts"],
+      "@gmf/map-data": ["../../packages/map-data/src/index.ts"],
+      "@gmf/map-ui": ["../../packages/map-ui/src/index.ts"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

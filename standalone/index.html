@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GMF Festival Map (standalone)</title>
+    <!--
+      Drop your final venue raster next to this file as venue-overlay.png (see data/overlay.json).
+      Serve this folder over HTTP (file:// blocks fetch), e.g.:
+        npx serve .
+    -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <style>
+      :root {
+        --gmf-surface-page: #0c1218;
+        --gmf-surface-panel: #141c26;
+        --gmf-surface-elevated: #1a2433;
+        --gmf-border-subtle: rgba(255, 255, 255, 0.08);
+        --gmf-font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        --gmf-text-primary: #f4f1ea;
+        --gmf-text-muted: rgba(244, 241, 234, 0.65);
+        --gmf-text-inverse: #0c1218;
+        --gmf-accent: #c9a227;
+        --gmf-accent-muted: rgba(201, 162, 39, 0.35);
+        --gmf-radius-md: 10px;
+        --gmf-shadow-panel: 0 8px 28px rgba(0, 0, 0, 0.45);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: var(--gmf-font-sans);
+        background: var(--gmf-surface-page);
+        color: var(--gmf-text-primary);
+      }
+      #gmf-root {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .gmf-map-shell {
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        margin: 0 auto;
+        width: 100%;
+        max-width: 1200px;
+        padding: 12px;
+      }
+      .gmf-map-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 14px;
+        background: var(--gmf-surface-panel);
+        border: 1px solid var(--gmf-border-subtle);
+        border-radius: var(--gmf-radius-md) var(--gmf-radius-md) 0 0;
+        border-bottom: none;
+      }
+      .gmf-map-filters button {
+        font: inherit;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid var(--gmf-border-subtle);
+        background: var(--gmf-surface-elevated);
+        color: var(--gmf-text-muted);
+        cursor: pointer;
+      }
+      .gmf-map-filters button[aria-pressed='true'] {
+        background: var(--gmf-accent);
+        color: var(--gmf-text-inverse);
+        border-color: var(--gmf-accent);
+      }
+      #gmf-map {
+        flex: 1;
+        min-height: 560px;
+        border-radius: 0 0 var(--gmf-radius-md) var(--gmf-radius-md);
+        border: 1px solid var(--gmf-border-subtle);
+      }
+      .gmf-map-legend {
+        position: absolute;
+        z-index: 1000;
+        right: 28px;
+        bottom: 36px;
+        min-width: 160px;
+        padding: 12px 14px;
+        background: var(--gmf-surface-panel);
+        border: 1px solid var(--gmf-border-subtle);
+        border-radius: var(--gmf-radius-md);
+        box-shadow: var(--gmf-shadow-panel);
+        font-size: 0.8125rem;
+      }
+      .gmf-map-legend strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--gmf-text-muted);
+      }
+      .gmf-map-legend ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .gmf-map-legend li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .gmf-map-legend .swatch {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.45);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="gmf-root">
+      <div class="gmf-map-shell">
+        <div class="gmf-map-filters" id="gmf-filters" aria-label="Filter map points"></div>
+        <div id="gmf-map" role="application" aria-label="Festival map"></div>
+        <div class="gmf-map-legend" id="gmf-legend"></div>
+      </div>
+    </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script>
+      (function () {
+        const LABELS = {
+          stage: 'Stages',
+          food: 'Food',
+          bar: 'Bars',
+          restroom: 'Restrooms',
+          entrance: 'Entrances',
+          parking: 'Parking',
+          merch: 'Merch',
+          info: 'Info',
+          medical: 'Medical',
+          vip: 'VIP'
+        };
+        const COLORS = {
+          stage: '#c17f2b',
+          food: '#2e8b57',
+          bar: '#6b4e9b',
+          restroom: '#3b6fb6',
+          entrance: '#22a860',
+          parking: '#64748b',
+          merch: '#c44c7a',
+          info: '#0ea5e9',
+          medical: '#dc2626',
+          vip: '#b8860b'
+        };
+        const ORDER = Object.keys(LABELS);
+
+        const CENTER = [27.9514, -82.4605];
+        const ZOOM = 15;
+
+        function escapeHtml(text) {
+          return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+        }
+
+        async function loadJson(url) {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error('Failed ' + url + ' ' + res.status);
+          return res.json();
+        }
+
+        function renderLegend(container) {
+          container.innerHTML =
+            '<strong>Legend</strong><ul>' +
+            ORDER.map(function (c) {
+              return (
+                '<li><span class="swatch" style="background:' +
+                COLORS[c] +
+                '" aria-hidden="true"></span>' +
+                LABELS[c] +
+                '</li>'
+              );
+            }).join('') +
+            '</ul>';
+        }
+
+        function main() {
+          renderLegend(document.getElementById('gmf-legend'));
+
+          loadJson('data/pois.json')
+            .then(function (pois) {
+              return loadJson('data/overlay.json').then(function (overlay) {
+                return { pois: pois, overlay: overlay };
+              });
+            })
+            .then(function (_ref) {
+              var pois = _ref.pois;
+              var overlay = _ref.overlay;
+
+              var map = L.map('gmf-map', { scrollWheelZoom: true }).setView(CENTER, ZOOM);
+              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution:
+                  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              }).addTo(map);
+
+              if (overlay && overlay.type === 'image' && overlay.bounds) {
+                var sw = overlay.bounds[0];
+                var ne = overlay.bounds[1];
+                var bounds = L.latLngBounds(L.latLng(sw[1], sw[0]), L.latLng(ne[1], ne[0]));
+                L.imageOverlay(overlay.url, bounds, { opacity: 0.85, interactive: false }).addTo(
+                  map
+                );
+              }
+
+              var markersLayer = L.layerGroup().addTo(map);
+              var filtersEl = document.getElementById('gmf-filters');
+              var selected = [];
+
+              function visible() {
+                if (selected.length === 0) return pois;
+                return pois.filter(function (p) {
+                  return selected.indexOf(p.category) !== -1;
+                });
+              }
+
+              function drawMarkers() {
+                markersLayer.clearLayers();
+                visible().forEach(function (poi) {
+                  var lng = poi.coordinates[0];
+                  var lat = poi.coordinates[1];
+                  var fill = COLORS[poi.category] || '#888';
+                  var m = L.circleMarker([lat, lng], {
+                    radius: 7,
+                    fillColor: fill,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.92
+                  });
+                  var desc = poi.description
+                    ? '<br><span style="opacity:.85">' + escapeHtml(poi.description) + '</span>'
+                    : '';
+                  m.bindPopup(
+                    '<strong>' +
+                      escapeHtml(poi.name) +
+                      '</strong><br><span style="text-transform:capitalize">' +
+                      escapeHtml(poi.category) +
+                      '</span>' +
+                      desc
+                  );
+                  m.addTo(markersLayer);
+                });
+              }
+
+              function syncFilterButtons() {
+                filtersEl.querySelectorAll('button').forEach(function (btn) {
+                  var cat = btn.getAttribute('data-cat');
+                  btn.setAttribute('aria-pressed', selected.indexOf(cat) !== -1 ? 'true' : 'false');
+                });
+              }
+
+              ORDER.forEach(function (cat) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.setAttribute('data-cat', cat);
+                b.textContent = LABELS[cat];
+                b.addEventListener('click', function () {
+                  var i = selected.indexOf(cat);
+                  if (i === -1) selected.push(cat);
+                  else selected.splice(i, 1);
+                  syncFilterButtons();
+                  drawMarkers();
+                });
+                filtersEl.appendChild(b);
+              });
+              syncFilterButtons();
+              drawMarkers();
+              setTimeout(function () {
+                map.invalidateSize();
+              }, 0);
+            })
+            .catch(function (e) {
+              document.getElementById('gmf-map').textContent = 'Could not load data: ' + e.message;
+            });
+        }
+
+        main();
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,42 @@
+{
+  "apiVersion": 3,
+  "name": "gmf/festival-map",
+  "title": "Festival Map",
+  "category": "widgets",
+  "icon": "location-alt",
+  "description": "Live festival map (OpenStreetMap + venue overlay) with POIs from your JSON API.",
+  "supports": {
+    "align": ["wide", "full"]
+  },
+  "attributes": {
+    "height": {
+      "type": "number",
+      "default": 640
+    },
+    "showLegend": {
+      "type": "boolean",
+      "default": true
+    },
+    "apiBaseUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "centerLat": {
+      "type": "number",
+      "default": 27.9514
+    },
+    "centerLng": {
+      "type": "number",
+      "default": -82.4605
+    },
+    "mapZoom": {
+      "type": "number",
+      "default": 15
+    }
+  },
+  "editorScript": "file:./index.js",
+  "viewScript": "file:./view.js",
+  "style": "file:./style-index.css",
+  "editorStyle": "file:./index.css",
+  "render": "file:./render.php"
+}

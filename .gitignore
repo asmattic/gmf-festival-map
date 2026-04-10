@@ -1,0 +1,16 @@
+.cursor/
+
+node_modules
+.pnpm-store
+.next
+.turbo
+dist
+build
+coverage
+.DS_Store
+.env*
+!.env.example
+*.log
+
+# Local archives (keep out of git history)
+assets/*.zip

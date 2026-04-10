@@ -1,0 +1,201 @@
+/**
+ * Gasparilla Music Fest — map shell tokens.
+ * Align variable values with the “Functionality explanation” design system in Figma
+ * (asmattic / gasparilla-music-fest). POI colors must match `map-core` `poiCategoryColors`.
+ */
+
+:root {
+  /* Surface */
+  --gmf-surface-page: #0c1218;
+  --gmf-surface-panel: #141c26;
+  --gmf-surface-elevated: #1a2433;
+  --gmf-border-subtle: rgba(255, 255, 255, 0.08);
+
+  /* Typography */
+  --gmf-font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --gmf-text-primary: #f4f1ea;
+  --gmf-text-muted: rgba(244, 241, 234, 0.65);
+  --gmf-text-inverse: #0c1218;
+
+  /* Accent (primary actions / focus) */
+  --gmf-accent: #c9a227;
+  --gmf-accent-muted: rgba(201, 162, 39, 0.35);
+
+  /* POI markers — mirrors @gmf/map-core poiCategoryColors */
+  --gmf-poi-stage: #c17f2b;
+  --gmf-poi-food: #2e8b57;
+  --gmf-poi-bar: #6b4e9b;
+  --gmf-poi-restroom: #3b6fb6;
+  --gmf-poi-entrance: #22a860;
+  --gmf-poi-parking: #64748b;
+  --gmf-poi-merch: #c44c7a;
+  --gmf-poi-info: #0ea5e9;
+  --gmf-poi-medical: #dc2626;
+  --gmf-poi-vip: #b8860b;
+
+  --gmf-radius-sm: 6px;
+  --gmf-radius-md: 10px;
+  --gmf-shadow-panel: 0 8px 28px rgba(0, 0, 0, 0.45);
+
+  --gmf-focus-ring: 2px solid var(--gmf-accent);
+}
+
+.gmf-map-shell {
+  position: relative;
+  font-family: var(--gmf-font-sans);
+  color: var(--gmf-text-primary);
+  background: var(--gmf-surface-page);
+  border-radius: var(--gmf-radius-md);
+  overflow: hidden;
+  box-shadow: var(--gmf-shadow-panel);
+}
+
+.gmf-map-shell .gmf-map-canvas {
+  z-index: 0;
+  border-radius: 0 0 var(--gmf-radius-md) var(--gmf-radius-md);
+}
+
+.gmf-map-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--gmf-surface-panel);
+  border-bottom: 1px solid var(--gmf-border-subtle);
+}
+
+.gmf-map-filters button {
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--gmf-border-subtle);
+  background: var(--gmf-surface-elevated);
+  color: var(--gmf-text-muted);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.gmf-map-filters button:hover {
+  color: var(--gmf-text-primary);
+  border-color: var(--gmf-accent-muted);
+}
+
+.gmf-map-filters button[aria-pressed='true'] {
+  background: var(--gmf-accent);
+  color: var(--gmf-text-inverse);
+  border-color: var(--gmf-accent);
+  box-shadow: 0 0 0 1px var(--gmf-accent-muted);
+}
+
+.gmf-map-filters button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--gmf-accent-muted);
+}
+
+.gmf-map-legend {
+  position: absolute;
+  z-index: 1000;
+  right: 12px;
+  bottom: 28px;
+  min-width: 160px;
+  max-width: min(220px, 42vw);
+  padding: 12px 14px;
+  background: var(--gmf-surface-panel);
+  border: 1px solid var(--gmf-border-subtle);
+  border-radius: var(--gmf-radius-md);
+  box-shadow: var(--gmf-shadow-panel);
+  font-size: 0.8125rem;
+}
+
+.gmf-map-legend strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gmf-text-muted);
+}
+
+.gmf-map-legend ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gmf-map-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: var(--gmf-text-primary);
+}
+
+.gmf-map-legend li:last-child {
+  margin-bottom: 0;
+}
+
+.gmf-map-legend .swatch {
+  flex-shrink: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+.gmf-map-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 32px;
+  font-family: var(--gmf-font-sans);
+  font-size: 1rem;
+  color: var(--gmf-text-muted);
+  background: var(--gmf-surface-panel);
+  border-radius: var(--gmf-radius-md);
+}
+
+/* Leaflet tweaks inside shell */
+.gmf-map-shell .leaflet-control-zoom a {
+  background: var(--gmf-surface-elevated);
+  color: var(--gmf-text-primary);
+  border-color: var(--gmf-border-subtle) !important;
+}
+
+.gmf-map-shell .leaflet-control-zoom a:hover {
+  background: var(--gmf-surface-panel);
+}
+
+.gmf-map-shell .leaflet-bar {
+  border: 1px solid var(--gmf-border-subtle);
+  border-radius: var(--gmf-radius-sm);
+  overflow: hidden;
+}
+
+.gmf-map-shell .leaflet-popup-content-wrapper {
+  background: var(--gmf-surface-panel);
+  color: var(--gmf-text-primary);
+  border-radius: var(--gmf-radius-sm);
+  box-shadow: var(--gmf-shadow-panel);
+}
+
+.gmf-map-shell .leaflet-popup-tip {
+  background: var(--gmf-surface-panel);
+}
+
+.gmf-map-shell .leaflet-popup-content {
+  margin: 10px 12px;
+  font-size: 0.875rem;
+}
+
+.gmf-map-shell .leaflet-container {
+  font-family: var(--gmf-font-sans);
+}
