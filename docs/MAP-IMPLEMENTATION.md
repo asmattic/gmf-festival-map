@@ -32,7 +32,7 @@ All three should consume the **same JSON shapes** so the live map matches your f
 | Export / file | Role |
 | ------------- | ---- |
 | `EmbeddedFestivalMap` | TanStack Query fetchers for POIs, stages, overlay; passes data to `FestivalMap` |
-| `FestivalMap` | Leaflet map, filters, legend, markers, image overlay |
+| `FestivalMap` | Leaflet map, filters, legend, POI markers, **stage markers** (gold, separate layer), image overlay |
 | `gmf-design-tokens.css` | Shell colors, typography, filter chips, legend panel (Gasparilla-aligned; sync with Figma when you have variable export) |
 
 Hooks (`usePoisQuery`, `useStagesQuery`, `useOverlayQuery`) call `@gmf/map-data` fetchers. Query keys and cache policies live in `map-core`.
