@@ -14,7 +14,7 @@
     "@gmf/map-data": "workspace:*",
     "@gmf/map-ui": "workspace:*",
     "@tanstack/react-query": "^5.90.2",
-    "next": "^16.0.0",
+    "next": "^16.2.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
